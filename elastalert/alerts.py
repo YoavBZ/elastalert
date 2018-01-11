@@ -132,6 +132,12 @@ class BasicMatchString(object):
         if 'alert_text' not in self.rule:
             self.text += self.rule['name'] + '\n\n'
 
+        if self.rule.get('alert_text_type') == "enhancement":
+            try:
+                return self.rule['alert_enhancement'].process(self.match)
+            except Exception as e:
+                raise EAException("Error running alert enhancement: %s" % (e), {'rule': self.rule['name']})
+
         self._add_custom_alert_text()
         self._ensure_new_line()
         if self.rule.get('alert_text_type') != 'alert_text_only':

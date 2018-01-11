@@ -325,6 +325,17 @@ def load_modules(rule, args=None):
         match_enhancements.append(enhancement(rule))
     rule['match_enhancements'] = match_enhancements
 
+    # Set alert enhancements
+    if 'alert_enhancements' in rule:
+        enhancement_name = rule['alert_enhancements']
+        if enhancement_name in dir(enhancements):
+            enhancement = getattr(enhancements, enhancement_name)
+        else:
+            enhancement = get_module(enhancement_name)
+        if not issubclass(enhancement, enhancements.BaseEnhancement):
+            raise EAException("Enhancement module %s not a subclass of BaseEnhancement" % (enhancement_name))
+        rule['alert_enhancements'] = enhancement(rule)
+
     # Convert rule type into RuleType object
     if rule['type'] in rules_mapping:
         rule['type'] = rules_mapping[rule['type']]
